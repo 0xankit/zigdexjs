@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package zigchain.dex;
+
+import "amino/amino.proto";
+import "gogoproto/gogo.proto";
+import "zigchain/dex/params.proto";
+import "zigchain/dex/pool.proto";
+import "zigchain/dex/pools_meta.proto";
+import "zigchain/dex/pool_uids.proto";
+
+option go_package = "zigchain/x/dex/types";
+
+// GenesisState defines the dex module's genesis state.
+message GenesisState {
+  
+  // params defines all the parameters of the module.
+           Params    params       = 1 [(gogoproto.nullable) = false, (amino.dont_omitempty) = true];
+           string    port_id      = 2;
+  repeated Pool      poolList     = 3 [(gogoproto.nullable) = false] ;
+           PoolsMeta poolsMeta    = 4;
+  repeated PoolUids  poolUidsList = 5 [(gogoproto.nullable) = false] ;
+}
+

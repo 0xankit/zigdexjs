@@ -1,0 +1,17 @@
+syntax = "proto3";
+package zigchain.dex;
+
+import "amino/amino.proto";
+import "gogoproto/gogo.proto";
+
+option go_package = "zigchain/x/dex/types";
+
+// Params defines the parameters for the module.
+message Params {
+  option (amino.name) = "zigchain/x/dex/Params";
+  option (gogoproto.equal) = true;
+
+
+  uint32 newPoolFeePct = 1;
+  uint32 creationFee = 2;
+}

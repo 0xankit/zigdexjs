@@ -1,0 +1,471 @@
+syntax = "proto3";
+package zigchain.poolmanager;
+
+import "amino/amino.proto";
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+import "cosmos/base/v1beta1/coin.proto";
+import "google/protobuf/any.proto";
+import "cosmos_proto/cosmos.proto";
+import "google/protobuf/timestamp.proto";
+import "zigchain/poolmanager/params.proto";
+import "zigchain/poolmanager/genesis.proto";
+import "zigchain/poolmanager/tx.proto";
+import "zigchain/poolmanager/swap_route.proto";
+import "zigchain/poolmanager/taker_fee_share.proto";
+
+option go_package = "zigchain/x/poolmanager/types";
+
+// Query defines the gRPC querier service.
+service Query {
+  
+  // Parameters queries the parameters of the module.
+  rpc Params (QueryParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/zigchain/poolmanager/params";
+  
+  }
+  
+  // Queries a list of AllPools items.
+  rpc AllPools (QueryAllPoolsRequest) returns (QueryAllPoolsResponse) {
+    option (google.api.http).get = "/zigchain/poolmanager/all_pools";
+  
+  }
+  
+  // Queries a Pool item.
+  rpc Pool (QueryPoolRequest) returns (QueryPoolResponse) {
+    option (google.api.http).get = "/zigchain/poolmanager/pool";
+  
+  }
+  
+  // Queries a list of NumPool items.
+  rpc NumPool (QueryNumPoolRequest) returns (QueryNumPoolResponse) {
+    option (google.api.http).get = "/zigchain/poolmanager/num_pool";
+  
+  }
+  
+  // Queries a list of TradingPairTakerFee items.
+  rpc TradingPairTakerFee (QueryTradingPairTakerFeeRequest) returns (QueryTradingPairTakerFeeResponse) {
+    option (google.api.http).get = "/zigchain/poolmanager/trading_pair_taker_fee";
+  
+  }
+  
+  // Queries a list of TakerFeeShareDenomsToAccruedValue items.
+  rpc TakerFeeShareDenomsToAccruedValue (QueryTakerFeeShareDenomsToAccruedValueRequest) returns (QueryTakerFeeShareDenomsToAccruedValueResponse) {
+    option (google.api.http).get = "/zigchain/poolmanager/{takerFeeDenom}/{denom}/taker_fee_share_denoms_to_accrued_value";
+  
+  }
+  
+  // Queries a list of TakerFeeShareAgreementFromDenom items.
+  rpc TakerFeeShareAgreementFromDenom (QueryTakerFeeShareAgreementFromDenomRequest) returns (QueryTakerFeeShareAgreementFromDenomResponse) {
+    option (google.api.http).get = "/zigchain/poolmanager/{denom}/taker_fee_share_agreement_from_denom";
+  
+  }
+  
+  // Queries a list of AllTakerFeeShareAgreements items.
+  rpc AllTakerFeeShareAgreements (QueryAllTakerFeeShareAgreementsRequest) returns (QueryAllTakerFeeShareAgreementsResponse) {
+    option (google.api.http).get = "/zigchain/poolmanager/all_taker_fee_share_agreements";
+  
+  }
+  
+  // Queries a list of AllTakerFeeShareAccumulators items.
+  rpc AllTakerFeeShareAccumulators (QueryAllTakerFeeShareAccumulatorsRequest) returns (QueryAllTakerFeeShareAccumulatorsResponse) {
+    option (google.api.http).get = "/zigchain/poolmanager/all_taker_fee_share_accumulators";
+  
+  }
+  
+  // Queries a list of TotalVolumeForPool items.
+  rpc TotalVolumeForPool (QueryTotalVolumeForPoolRequest) returns (QueryTotalVolumeForPoolResponse) {
+    option (google.api.http).get = "/zigchain/poolmanager/pools/{pool_id}/total_volume_for_pool";
+  
+  }
+  
+  // Queries a list of TotalPoolLiquidity items.
+  rpc TotalPoolLiquidity (QueryTotalPoolLiquidityRequest) returns (QueryTotalPoolLiquidityResponse) {
+    option (google.api.http).get = "/zigchain/poolmanager/pools/{pool_id}/total_pool_liquidity";
+  
+  }
+  
+  // Queries a list of TotalLiquidity items.
+  rpc TotalLiquidity (QueryTotalLiquidityRequest) returns (QueryTotalLiquidityResponse) {
+    option (google.api.http).get = "/zigchain/poolmanager/total_liquidity";
+  
+  }
+  
+  // Queries a list of SpotPrice items.
+  rpc SpotPrice (QuerySpotPriceRequest) returns (QuerySpotPriceResponse) {
+    option (google.api.http).get = "/zigchain/poolmanager/pools/{pool_id}/spot_price";
+  
+  }
+  
+  // Queries a list of ListPoolsByDenom items.
+  rpc ListPoolsByDenom (QueryListPoolsByDenomRequest) returns (QueryListPoolsByDenomResponse) {
+    option (google.api.http).get = "/zigchain/poolmanager/list_pools_by_denom";
+  
+  }
+  
+  // Queries a list of RegisteredAlloyedPoolFromPoolId items.
+  rpc RegisteredAlloyedPoolFromPoolId (QueryRegisteredAlloyedPoolFromPoolIdRequest) returns (QueryRegisteredAlloyedPoolFromPoolIdResponse) {
+    option (google.api.http).get = "/zigchain/poolmanager/{pool_id}/registered_alloyed_pool_from_pool_id";
+  
+  }
+  
+  // Queries a list of RegisteredAlloyedPoolFromDenom items.
+  rpc RegisteredAlloyedPoolFromDenom (QueryRegisteredAlloyedPoolFromDenomRequest) returns (QueryRegisteredAlloyedPoolFromDenomResponse) {
+    option (google.api.http).get = "/zigchain/poolmanager/{denom}/registered_alloyed_pool_from_denom";
+  
+  }
+  
+  // Queries a list of AllRegisteredAlloyedPools items.
+  rpc AllRegisteredAlloyedPools (QueryAllRegisteredAlloyedPoolsRequest) returns (QueryAllRegisteredAlloyedPoolsResponse) {
+    option (google.api.http).get = "/zigchain/poolmanager/all_registered_alloyed_pools";
+  
+  }
+  
+  // Queries a list of EstimateTradeBasedOnPriceImpact items.
+  rpc EstimateTradeBasedOnPriceImpact (QueryEstimateTradeBasedOnPriceImpactRequest) returns (QueryEstimateTradeBasedOnPriceImpactResponse) {
+    option (google.api.http).get = "/zigchain/poolmanager/{pool_id}/estimate_trade_based_on_price_impact";
+  
+  }
+  
+  // Queries a list of EstimateSwapExactAmountOutWithPrimitiveTypes items.
+  rpc EstimateSwapExactAmountOutWithPrimitiveTypes (QueryEstimateSwapExactAmountOutWithPrimitiveTypesRequest) returns (QueryEstimateSwapExactAmountOutWithPrimitiveTypesResponse) {
+    option (google.api.http).get = "/zigchain/poolmanager/{pool_id}/estimate/estimate_swap_exact_amount_out_with_primitive_types";
+  
+  }
+  
+  // Queries a list of EstimateSwapExactAmountOut items.
+  rpc EstimateSwapExactAmountOut (QueryEstimateSwapExactAmountOutRequest) returns (QueryEstimateSwapExactAmountOutResponse) {
+    option (google.api.http).get = "/zigchain/poolmanager/{pool_id}/estimate_swap_exact_amount_out";
+  
+  }
+  
+  // Queries a list of EstimateSwapExactAmountInWithPrimitiveTypes items.
+  rpc EstimateSwapExactAmountInWithPrimitiveTypes (QueryEstimateSwapExactAmountInWithPrimitiveTypesRequest) returns (QueryEstimateSwapExactAmountInWithPrimitiveTypesResponse) {
+    option (google.api.http).get = "/zigchain/poolmanager/{pool_id}/estimate/estimate_swap_exact_amount_in_with_primitive_types";
+  
+  }
+  
+  // Queries a list of EstimateSwapExactAmountIn items.
+  rpc EstimateSwapExactAmountIn (QueryEstimateSwapExactAmountInRequest) returns (QueryEstimateSwapExactAmountInResponse) {
+    option (google.api.http).get = "/zigchain/poolmanager/{pool_id}/estimate/estimate_swap_exact_amount_in";
+  
+  }
+  
+  // Queries a list of EstimateSinglePoolSwapExactAmountOut items.
+  rpc EstimateSinglePoolSwapExactAmountOut (QueryEstimateSinglePoolSwapExactAmountOutRequest) returns (QueryEstimateSinglePoolSwapExactAmountOutResponse) {
+    option (google.api.http).get = "/zigchain/poolmanager/{pool_id}/estimate_out/estimate_single_pool_swap_exact_amount_out";
+  
+  }
+  
+  // Queries a list of EstimateSinglePoolSwapExactAmountIn items.
+  rpc EstimateSinglePoolSwapExactAmountIn (QueryEstimateSinglePoolSwapExactAmountInRequest) returns (QueryEstimateSinglePoolSwapExactAmountInResponse) {
+    option (google.api.http).get = "/zigchain/poolmanager/{pool_id}/estimate/estimate_single_pool_swap_exact_amount_in";
+  
+  }
+}
+// QueryParamsRequest is request type for the Query/Params RPC method.
+message QueryParamsRequest {}
+
+// QueryParamsResponse is response type for the Query/Params RPC method.
+message QueryParamsResponse {
+  
+  // params holds all the parameters of this module.
+  Params params = 1 [(gogoproto.nullable) = false, (amino.dont_omitempty) = true];
+}
+
+//=============================== Params
+message ParamsRequest {}
+
+message ParamsResponse {
+  Params params = 1 [(gogoproto.nullable) = false];
+}
+
+message EstimateSwapExactAmountInResponse {
+  string token_out_amount = 1 [(gogoproto.customtype) = "cosmossdk.io/math.Int", (gogoproto.moretags) = "yaml:\"token_out_amount\"", (gogoproto.nullable) = false];
+}
+
+//=============================== EstimateSwapExactAmountOut
+message EstimateSwapExactAmountOutRequest {
+  
+  // DEPRECATED
+           string             sender    = 1 [(gogoproto.moretags) = "yaml:\"sender\",deprecated:\"true\"" , deprecated           = true ];
+           uint64             pool_id   = 2 [(gogoproto.moretags) = "yaml:\"pool_id\",deprecated:\"true\"", deprecated           = true ];
+  repeated SwapAmountOutRoute routes    = 3 [(gogoproto.moretags) = "yaml:\"routes\""                     , (gogoproto.nullable) = false];
+           string             token_out = 4 [(gogoproto.moretags) = "yaml:\"token_out\""                  ] ;
+}
+
+message EstimateSwapExactAmountOutWithPrimitiveTypesRequest {
+           uint64 pool_id               = 1 [(gogoproto.moretags) = "yaml:\"pool_id\",deprecated:\"true\"", deprecated = true];
+  repeated uint64 routes_pool_id        = 2 [(gogoproto.moretags) = "yaml:\"routes_pool_id\""             ] ;
+  repeated string routes_token_in_denom = 3 [(gogoproto.moretags) = "yaml:\"routes_token_in_denom\""      ] ;
+           string token_out             = 4 [(gogoproto.moretags) = "yaml:\"token_out\""                  ] ;
+}
+
+message EstimateSwapExactAmountOutResponse {
+  string token_in_amount = 1 [(gogoproto.customtype) = "cosmossdk.io/math.Int", (gogoproto.moretags) = "yaml:\"token_in_amount\"", (gogoproto.nullable) = false];
+}
+
+//=============================== EstimateTradeBasedOnPriceImpact
+// EstimateTradeBasedOnPriceImpactRequest represents a request to estimate a
+// trade for Balancer/StableSwap/Concentrated liquidity pool types based on the
+// given parameters.
+message EstimateTradeBasedOnPriceImpactRequest {
+  
+  // from_coin is the total amount of tokens that the user wants to sell.
+  cosmos.base.v1beta1.Coin from_coin = 1 [(gogoproto.nullable) = false];
+  
+  // to_coin_denom is the denom identifier of the token that the user wants to
+  // buy.
+  string to_coin_denom = 2;
+  
+  // pool_id is the identifier of the liquidity pool that the trade will occur
+  // on.
+  uint64 pool_id = 3;
+  
+  // max_price_impact is the maximum percentage that the user is willing
+  // to affect the price of the liquidity pool.
+  string max_price_impact = 4 [(gogoproto.customtype) = "cosmossdk.io/math.LegacyDec", (gogoproto.nullable) = false];
+  
+  // external_price is an optional external price that the user can enter.
+  // It adjusts the MaxPriceImpact as the SpotPrice of a pool can be changed at
+  // any time.
+  string external_price = 5 [(gogoproto.customtype) = "cosmossdk.io/math.LegacyDec", (gogoproto.nullable) = false];
+}
+
+// EstimateTradeBasedOnPriceImpactResponse represents the response data
+// for an estimated trade based on price impact. If a trade fails to be
+// estimated the response would be 0,0 for input_coin and output_coin and will
+// not error.
+message EstimateTradeBasedOnPriceImpactResponse {
+  
+  // input_coin is the actual input amount that would be tradeable
+  // under the specified price impact.
+  cosmos.base.v1beta1.Coin input_coin = 1 [(gogoproto.nullable) = false];
+  
+  // output_coin is the amount of tokens of the ToCoinDenom type
+  // that will be received for the actual InputCoin trade.
+  cosmos.base.v1beta1.Coin output_coin = 2 [(gogoproto.nullable) = false];
+}
+
+message QueryAllPoolsRequest {}
+
+message QueryAllPoolsResponse {
+  repeated google.protobuf.Any pools = 1 [(cosmos_proto.accepts_interface) = "PoolI"];
+}
+
+message QueryPoolRequest {
+  uint64 pool_id = 1 [(gogoproto.moretags) = "yaml:\"pool_id\""];
+}
+
+message QueryPoolResponse {
+  google.protobuf.Any pool = 1 [(cosmos_proto.accepts_interface) = "PoolI"];
+}
+
+message QueryNumPoolRequest {}
+
+message QueryNumPoolResponse {
+  uint64 num_pools = 1 [(gogoproto.moretags) = "yaml:\"num_pools\""];
+}
+
+message QueryTradingPairTakerFeeRequest {
+  string denom_0 = 1 [(gogoproto.moretags) = "yaml:\"denom_0\""];
+  string denom_1 = 2 [(gogoproto.moretags) = "yaml:\"denom_1\""];
+}
+
+message QueryTradingPairTakerFeeResponse {
+  string taker_fee = 1 [(gogoproto.customtype) = "cosmossdk.io/math.LegacyDec", (gogoproto.nullable) = false];
+}
+
+message QueryTakerFeeShareDenomsToAccruedValueRequest {
+  string denom         = 1;
+  string takerFeeDenom = 2;
+}
+
+message QueryTakerFeeShareDenomsToAccruedValueResponse {
+  string amount = 1 [(gogoproto.customtype) = "cosmossdk.io/math.Int", (gogoproto.moretags) = "yaml:\"amount\"", (gogoproto.nullable) = false];
+}
+
+message QueryTakerFeeShareAgreementFromDenomRequest {
+  string denom = 1;
+}
+
+message QueryTakerFeeShareAgreementFromDenomResponse {
+  TakerFeeShareAgreement taker_fee_share_agreement = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllTakerFeeShareAgreementsRequest {}
+
+message QueryAllTakerFeeShareAgreementsResponse {
+  repeated TakerFeeShareAgreement taker_fee_share_agreements = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllTakerFeeShareAccumulatorsRequest {}
+
+message QueryAllTakerFeeShareAccumulatorsResponse {
+  repeated TakerFeeSkimAccumulator taker_fee_skim_accumulators = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryTotalVolumeForPoolRequest {
+  uint64 pool_id = 1 [(gogoproto.moretags) = "yaml:\"pool_id\""];
+}
+
+message QueryTotalVolumeForPoolResponse {
+  repeated cosmos.base.v1beta1.Coin volume = 1 [(gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"volume\"", (gogoproto.nullable) = false];
+}
+
+message QueryTotalPoolLiquidityRequest {
+  uint64 pool_id = 1 [(gogoproto.moretags) = "yaml:\"pool_id\""];
+}
+
+message QueryTotalPoolLiquidityResponse {
+  repeated cosmos.base.v1beta1.Coin liquidity = 1 [(gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"liquidity\"", (gogoproto.nullable) = false];
+}
+
+message QueryTotalLiquidityRequest {}
+
+message QueryTotalLiquidityResponse {
+  repeated cosmos.base.v1beta1.Coin liquidity = 1 [(gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"liquidity\"", (gogoproto.nullable) = false];
+}
+
+message QuerySpotPriceRequest {
+  uint64 pool_id           = 1 [(gogoproto.moretags) = "yaml:\"pool_id\""          ];
+  string base_asset_denom  = 2 [(gogoproto.moretags) = "yaml:\"base_asset_denom\"" ];
+  string quote_asset_denom = 3 [(gogoproto.moretags) = "yaml:\"quote_asset_denom\""];
+}
+
+message QuerySpotPriceResponse {
+  string spot_price = 1 [(gogoproto.moretags) = "yaml:\"spot_price\""];
+}
+
+message QueryListPoolsByDenomRequest {
+  string denom = 1 [(gogoproto.moretags) = "yaml:\"denom\""];
+}
+
+message QueryListPoolsByDenomResponse {
+  repeated google.protobuf.Any pools = 1 [(cosmos_proto.accepts_interface) = "PoolI"];
+}
+
+message QueryRegisteredAlloyedPoolFromPoolIdRequest {
+  uint64 pool_id = 1;
+}
+
+message QueryRegisteredAlloyedPoolFromPoolIdResponse {
+  AlloyContractTakerFeeShareState contract_state = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryRegisteredAlloyedPoolFromDenomRequest {
+  string denom = 1;
+}
+
+message QueryRegisteredAlloyedPoolFromDenomResponse {
+  AlloyContractTakerFeeShareState contract_state = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllRegisteredAlloyedPoolsRequest {}
+
+message QueryAllRegisteredAlloyedPoolsResponse {
+  repeated AlloyContractTakerFeeShareState contract_states = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryEstimateTradeBasedOnPriceImpactRequest {
+  
+  // from_coin is the total amount of tokens that the user wants to sell.
+  cosmos.base.v1beta1.Coin from_coin = 1 [(gogoproto.nullable) = false];
+  
+  // to_coin_denom is the denom identifier of the token that the user wants to
+  // buy.
+  string to_coin_denom = 2;
+  
+  // pool_id is the identifier of the liquidity pool that the trade will occur
+  // on.
+  uint64 pool_id = 3;
+  
+  // max_price_impact is the maximum percentage that the user is willing
+  // to affect the price of the liquidity pool.
+  string max_price_impact = 4 [(gogoproto.customtype) = "cosmossdk.io/math.LegacyDec", (gogoproto.nullable) = false];
+  
+  // external_price is an optional external price that the user can enter.
+  // It adjusts the MaxPriceImpact as the SpotPrice of a pool can be changed at
+  // any time.
+  string external_price = 5 [(gogoproto.customtype) = "cosmossdk.io/math.LegacyDec", (gogoproto.nullable) = false];
+}
+
+message QueryEstimateTradeBasedOnPriceImpactResponse {
+  
+  // input_coin is the actual input amount that would be tradeable
+  // under the specified price impact.
+  cosmos.base.v1beta1.Coin input_coin = 1 [(gogoproto.nullable) = false];
+  
+  // output_coin is the amount of tokens of the ToCoinDenom type
+  // that will be received for the actual InputCoin trade.
+  cosmos.base.v1beta1.Coin output_coin = 2 [(gogoproto.nullable) = false];
+}
+
+message QueryEstimateSwapExactAmountOutWithPrimitiveTypesRequest {
+           uint64 pool_id               = 1 [(gogoproto.moretags) = "yaml:\"pool_id\",deprecated:\"true\"", deprecated = true];
+  repeated uint64 routes_pool_id        = 2 [(gogoproto.moretags) = "yaml:\"routes_pool_id\""             ] ;
+  repeated string routes_token_in_denom = 3 [(gogoproto.moretags) = "yaml:\"routes_token_in_denom\""      ] ;
+           string token_out             = 4 [(gogoproto.moretags) = "yaml:\"token_out\""                  ] ;
+}
+
+message QueryEstimateSwapExactAmountOutWithPrimitiveTypesResponse {
+  string token_in_amount = 1 [(gogoproto.customtype) = "cosmossdk.io/math.Int", (gogoproto.moretags) = "yaml:\"token_in_amount\"", (gogoproto.nullable) = false];
+}
+
+message QueryEstimateSwapExactAmountOutRequest {
+           string             sender    = 1 [(gogoproto.moretags) = "yaml:\"sender\",deprecated:\"true\"" , deprecated           = true ];
+           uint64             pool_id   = 2 [(gogoproto.moretags) = "yaml:\"pool_id\",deprecated:\"true\"", deprecated           = true ];
+  repeated SwapAmountOutRoute routes    = 3 [(gogoproto.moretags) = "yaml:\"routes\""                     , (gogoproto.nullable) = false];
+           string             token_out = 4 [(gogoproto.moretags) = "yaml:\"token_out\""                  ] ;
+}
+
+message QueryEstimateSwapExactAmountOutResponse {
+  string token_in_amount = 1 [(gogoproto.customtype) = "cosmossdk.io/math.Int", (gogoproto.moretags) = "yaml:\"token_in_amount\"", (gogoproto.nullable) = false];
+}
+
+message QueryEstimateSwapExactAmountInWithPrimitiveTypesRequest {
+           uint64 pool_id                = 1 [(gogoproto.moretags) = "yaml:\"pool_id\",deprecated:\"true\"", deprecated = true];
+           string token_in               = 2 [(gogoproto.moretags) = "yaml:\"token_in\""                   ] ;
+  repeated uint64 routes_pool_id         = 3 [(gogoproto.moretags) = "yaml:\"routes_pool_id\""             ] ;
+  repeated string routes_token_out_denom = 4 [(gogoproto.moretags) = "yaml:\"routes_token_out_denom\""     ] ;
+}
+
+message QueryEstimateSwapExactAmountInWithPrimitiveTypesResponse {
+  string token_out_amount = 1 [(gogoproto.customtype) = "cosmossdk.io/math.Int", (gogoproto.moretags) = "yaml:\"token_out_amount\"", (gogoproto.nullable) = false];
+}
+
+message QueryEstimateSwapExactAmountInRequest {
+           string            sender   = 1 [(gogoproto.moretags) = "yaml:\"sender\",deprecated:\"true\"" , deprecated           = true ];
+           uint64            pool_id  = 2 [(gogoproto.moretags) = "yaml:\"pool_id\",deprecated:\"true\"", deprecated           = true ];
+           string            token_in = 3 [(gogoproto.moretags) = "yaml:\"token_in\""                   ] ;
+  repeated SwapAmountInRoute routes   = 4 [(gogoproto.moretags) = "yaml:\"routes\""                     , (gogoproto.nullable) = false];
+}
+
+message QueryEstimateSwapExactAmountInResponse {
+  string token_out_amount = 1 [(gogoproto.customtype) = "cosmossdk.io/math.Int", (gogoproto.moretags) = "yaml:\"token_out_amount\"", (gogoproto.nullable) = false];
+}
+
+message QueryEstimateSinglePoolSwapExactAmountOutRequest {
+  uint64 pool_id        = 1 [(gogoproto.moretags) = "yaml:\"pool_id\""       ];
+  string token_in_denom = 2 [(gogoproto.moretags) = "yaml:\"token_in_denom\""];
+  string token_out      = 3 [(gogoproto.moretags) = "yaml:\"token_out\""     ];
+}
+
+message QueryEstimateSinglePoolSwapExactAmountOutResponse {
+  string token_in_amount = 1 [(gogoproto.customtype) = "cosmossdk.io/math.Int", (gogoproto.moretags) = "yaml:\"token_in_amount\"", (gogoproto.nullable) = false];
+}
+
+message QueryEstimateSinglePoolSwapExactAmountInRequest {
+  uint64 pool_id         = 1 [(gogoproto.moretags) = "yaml:\"pool_id\""        ];
+  string token_in        = 2 [(gogoproto.moretags) = "yaml:\"token_in\""       ];
+  string token_out_denom = 3 [(gogoproto.moretags) = "yaml:\"token_out_denom\""];
+}
+
+message QueryEstimateSinglePoolSwapExactAmountInResponse {
+  string token_out_amount = 1 [
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.moretags) = "yaml:\"token_out_amount\"",
+    (gogoproto.nullable) = false
+  ];
+}

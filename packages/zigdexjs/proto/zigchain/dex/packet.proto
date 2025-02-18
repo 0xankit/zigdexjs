@@ -1,0 +1,13 @@
+syntax = "proto3";
+package zigchain.dex;
+
+option go_package = "zigchain/x/dex/types";
+
+message DexPacketData {
+    oneof packet {
+        NoData noData = 1;
+    }
+}
+
+message NoData {
+}

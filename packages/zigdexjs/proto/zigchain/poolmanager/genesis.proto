@@ -1,0 +1,26 @@
+syntax = "proto3";
+package zigchain.poolmanager;
+
+import "amino/amino.proto";
+import "gogoproto/gogo.proto";
+import "zigchain/poolmanager/tx.proto";
+import "zigchain/poolmanager/params.proto";
+import "zigchain/poolmanager/module_route.proto";
+
+option go_package = "zigchain/x/poolmanager/types";
+
+// GenesisState defines the poolmanager module's genesis state.
+message GenesisState {
+  // the next_pool_id
+  uint64 next_pool_id = 1;
+  // params is the container of poolmanager parameters.
+  Params params = 2 [ (gogoproto.nullable) = false ];
+  // pool_routes is the container of the mappings from pool id to pool type.
+  repeated ModuleRoute pool_routes = 3 [ (gogoproto.nullable) = false ];
+
+  // KVStore state
+  TakerFeesTracker taker_fees_tracker = 4;
+  repeated PoolVolume pool_volumes = 5;
+  repeated DenomPairTakerFee denom_pair_taker_fee_store = 6
+      [ (gogoproto.nullable) = false ];
+}

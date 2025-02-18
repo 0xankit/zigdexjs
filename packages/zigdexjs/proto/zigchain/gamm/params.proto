@@ -1,0 +1,20 @@
+syntax = "proto3";
+package zigchain.gamm;
+
+import "amino/amino.proto";
+import "gogoproto/gogo.proto";
+import "cosmos/base/v1beta1/coin.proto";
+
+option go_package = "zigchain/x/gamm/types";
+
+// Params defines the parameters for the module.
+message Params {
+  option (amino.name) = "zigchain/x/gamm/Params";
+  option (gogoproto.equal) = true;
+
+  repeated cosmos.base.v1beta1.Coin pool_creation_fee = 1 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
+    (gogoproto.moretags) = "yaml:\"pool_creation_fee\""
+  ];
+}

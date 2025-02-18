@@ -1,0 +1,142 @@
+syntax = "proto3";
+
+package zigchain.factory;
+
+import "amino/amino.proto";
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+import "zigchain/factory/params.proto";
+import "zigchain/factory/denom.proto";
+import "zigchain/factory/denom_auth.proto";
+import "cosmos_proto/cosmos.proto";
+option go_package = "zigchain/x/factory/types";
+
+// Query defines the gRPC querier service.
+service Query {
+  
+  // QueryParams Parameters queries the parameters of the module.
+  rpc Params (QueryParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/zigchain/factory/params";
+  
+  }
+  
+  // QueryDenom Queries a list of Denom items.
+  rpc Denom        (QueryGetDenomRequest    ) returns (QueryDenomResponse    ) {
+    option (google.api.http).get = "/zigchain/factory/denom/{denom}";
+  
+  }
+  // Queries a list of Denom items.
+  rpc DenomAll     (QueryAllDenomRequest    ) returns (QueryAllDenomResponse    ) {
+    option (google.api.http).get = "/zigchain/factory/denom";
+  
+  }
+  // QueryDenomsByAdmin Queries a list of Denom items.
+  rpc DenomsByAdmin (QueryDenomByAdminRequest) returns (QueryDenomByAdminResponse) {
+    option (google.api.http).get = "/zigchain/factory/denomByAdmin/{admin}";
+  
+  }
+  
+  // QueryGetDenomAuth a denom DenomAuth items.
+  rpc DenomAuth  (QueryGetDenomAuthRequest) returns (QueryDenomAuthResponse) {
+    option (google.api.http).get = "/zigchain/factory/denom_auth/{denom}";
+
+  }
+  // QueryListDenomAuth queries a list of DenomAuth items.
+  // buf:lint:ignore RPC_RESPONSE_STANDARD_NAME
+  rpc ListDenomAuth (QueryAllDenomAuthRequest) returns (QueryAllDenomAuthResponse) {
+    option (google.api.http).get = "/zigchain/factory/denom_auth";
+
+  }
+}
+// QueryParamsRequest is request type for the Query/Params RPC method.
+message QueryParamsRequest {}
+
+// QueryParamsResponse is response type for the Query/Params RPC method.
+message QueryParamsResponse {
+  
+  // params holds all the parameters of this module.
+  Params params = 1 [(gogoproto.nullable) = false, (amino.dont_omitempty) = true];
+}
+
+// QueryGetDenomRequest get denom info by denom.
+message QueryGetDenomRequest {
+  string denom = 1;
+}
+
+// QueryDenomResponse is response type for the Query/DenomByAdmin RPC method.
+message QueryDenomResponse {
+  string denom = 1;
+  string supply = 2 [
+    (cosmos_proto.scalar)  = "cosmos.Uint",
+    (gogoproto.customtype) = "cosmossdk.io/math.Uint",
+    (gogoproto.nullable)   = false,
+    (amino.dont_omitempty) = true
+  ];
+  string maxSupply = 3 [
+    (cosmos_proto.scalar)  = "cosmos.Uint",
+    (gogoproto.customtype) = "cosmossdk.io/math.Uint",
+    (gogoproto.nullable)   = false,
+    (amino.dont_omitempty) = true
+  ];
+  bool canChangeMaxSupply = 4 [(amino.dont_omitempty) = true];
+  string creator = 5;
+  string bankAdmin = 6;
+  string metadataAdmin = 7;
+}
+
+// QueryDenomByOwnerRequest is request type for the Query/DenomByOwner RPC method.
+message QueryDenomByAdminRequest {
+  string                                admin      = 1;
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+}
+
+// QueryDenomByOwnerResponse is response type for the Query/DenomByOwner RPC method.
+message QueryAllDenomRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+// QueryDenomByOwnerResponse is response type for the Query/QueryAllDenom RPC method.
+message QueryAllDenomResponse {
+  repeated Denom                                  denom      = 1 [(gogoproto.nullable) = false];
+           cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// QueryDenomByOwnerResponse is response type for the Query/QueryDenomByAdmin RPC method.
+message QueryDenomByAdminResponse {
+  repeated string                                  denoms      = 1 [(gogoproto.nullable) = false];
+           cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// QueryDenomByOwnerResponse is response type for the Query/DenomByAdmin RPC method.
+message QueryAllDenomsByAdminRequest {
+  string                                admin      = 1;
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+}
+
+// QueryAllDenomsByAdminResponse is response type for the Query/DenomByOwner RPC method.
+message QueryAllDenomsByAdminResponse {
+  string                                 denoms     = 1;
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// QueryGetDenomAuthRequest is request type for the Query/GetDenomAuth RPC method.
+message QueryGetDenomAuthRequest {
+  string denom = 1;
+}
+
+// QueryGetDenomAuthResponse is response type for the Query/GetDenomAuth RPC method.
+message QueryDenomAuthResponse {
+  DenomAuth denomAuth = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryListDenomAuthRequest is request type for the Query/ListDenomAuth RPC method.
+message QueryAllDenomAuthRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+// QueryListDenomAuthResponse is response type for the Query/ListDenomAuth RPC method.
+message QueryAllDenomAuthResponse {
+  repeated DenomAuth                              denomAuth  = 1 [(gogoproto.nullable) = false];
+           cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}

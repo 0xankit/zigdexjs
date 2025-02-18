@@ -1,0 +1,18 @@
+syntax = "proto3";
+package zigchain.twap;
+
+import "amino/amino.proto";
+import "gogoproto/gogo.proto";
+import "zigchain/twap/params.proto";
+import "zigchain/twap/twap_record.proto";
+
+option go_package = "zigchain/x/twap/types";
+
+// GenesisState defines the twap module's genesis state.
+message GenesisState {
+  // twaps is the collection of all twap records.
+  repeated TwapRecord twaps = 1 [ (gogoproto.nullable) = false ];
+
+  // params is the container of twap parameters.
+  Params params = 2 [ (gogoproto.nullable) = false ];
+}

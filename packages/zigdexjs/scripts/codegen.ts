@@ -77,7 +77,7 @@ export const options: TelescopeInput = {
       },
     },
     lcdClients: {
-      enabled: false
+      enabled: true
     },
     rpcClients: {
       type: 'tendermint',
@@ -85,15 +85,15 @@ export const options: TelescopeInput = {
     },
 
     reactQuery: {
-      enabled: false
+      enabled: true
     },
 
     mobx: {
-      enabled: false
+      enabled: true
     },
 
     pinia: {
-      enabled: false
+      enabled: true
     }
   }
 };

@@ -1,0 +1,21 @@
+syntax = "proto3";
+package zigchain.twap;
+
+import "amino/amino.proto";
+import "gogoproto/gogo.proto";
+import "google/protobuf/duration.proto";
+
+option go_package = "zigchain/x/twap/types";
+
+// Params defines the parameters for the module.
+message Params {
+  option (amino.name) = "zigchain/x/twap/Params";
+  option (gogoproto.equal) = true;
+
+  string prune_epoch_identifier = 1;
+  google.protobuf.Duration record_history_keep_period = 2 [
+    (gogoproto.moretags) = "yaml:\"record_history_keep_period\"",
+    (gogoproto.stdduration) = true,
+    (gogoproto.nullable) = false
+  ];
+}

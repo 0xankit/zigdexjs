@@ -1,0 +1,307 @@
+syntax = "proto3";
+
+package zigchain.gamm;
+
+import "cosmos/base/v1beta1/coin.proto";
+import "amino/amino.proto";
+import "cosmos/msg/v1/msg.proto";
+import "cosmos_proto/cosmos.proto";
+import "gogoproto/gogo.proto";
+import "zigchain/gamm/params.proto";
+import "zigchain/gamm/stableswap_pool.proto";
+
+option go_package = "zigchain/x/gamm/types";
+
+// Msg defines the Msg service.
+service Msg {
+  option (cosmos.msg.v1.service) = true;
+  
+  // UpdateParams defines a (governance) operation for updating the module
+  // parameters. The authority defaults to the x/gov module account.
+  rpc UpdateParams                   (MsgUpdateParams                  ) returns (MsgUpdateParamsResponse                  );
+  rpc JoinPool                       (MsgJoinPool                      ) returns (MsgJoinPoolResponse                      );
+  rpc ExitPool                       (MsgExitPool                      ) returns (MsgExitPoolResponse                      );
+  rpc SwapExactAmountIn              (MsgSwapExactAmountIn             ) returns (MsgSwapExactAmountInResponse             );
+  rpc SwapExactAmountOut             (MsgSwapExactAmountOut            ) returns (MsgSwapExactAmountOutResponse            );
+  rpc JoinSwapExternAmountIn         (MsgJoinSwapExternAmountIn        ) returns (MsgJoinSwapExternAmountInResponse        );
+  rpc JoinSwapShareAmountOut         (MsgJoinSwapShareAmountOut        ) returns (MsgJoinSwapShareAmountOutResponse        );
+  rpc ExitSwapExternAmountOut        (MsgExitSwapExternAmountOut       ) returns (MsgExitSwapExternAmountOutResponse       );
+  rpc ExitSwapShareAmountIn          (MsgExitSwapShareAmountIn         ) returns (MsgExitSwapShareAmountInResponse         );
+  rpc CreateStableswapPool           (MsgCreateStableswapPool          ) returns (MsgCreateStableswapPoolResponse          );
+  rpc StableSwapAdjustScalingFactors (MsgStableSwapAdjustScalingFactors) returns (MsgStableSwapAdjustScalingFactorsResponse);
+}
+// MsgUpdateParams is the Msg/UpdateParams request type.
+message MsgUpdateParams {
+  option (cosmos.msg.v1.signer) =                       "authority";
+  option           (amino.name) = "zigchain/x/gamm/MsgUpdateParams";
+  
+  // authority is the address that controls the module (defaults to x/gov unless overwritten).
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+
+  // params defines the module parameters to update.
+  
+  // NOTE: All parameters must be supplied.
+  Params params = 2 [(gogoproto.nullable) = false, (amino.dont_omitempty) = true];
+}
+
+// MsgUpdateParamsResponse defines the response structure for executing a
+// MsgUpdateParams message.
+message MsgUpdateParamsResponse {}
+
+message MsgJoinPool {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 5;
+  option           (amino.name) = "zigchain/gamm/join-pool";
+  option (cosmos.msg.v1.signer) =                  "sender";
+           string                   sender           = 1 [(gogoproto.moretags)   = "yaml:\"sender\""              ] ;
+           uint64                   pool_id          = 2 [(gogoproto.moretags)   = "yaml:\"pool_id\""             ] ;
+           string                   share_out_amount = 3 [(gogoproto.customtype) = "cosmossdk.io/math.Int"        , (gogoproto.moretags) = "yaml:\"pool_amount_out\"", (gogoproto.nullable) = false];
+  repeated cosmos.base.v1beta1.Coin token_in_maxs    = 4 [(gogoproto.moretags)   = "yaml:\"token_in_max_amounts\"", (gogoproto.nullable) = false                     ] ;
+}
+
+message MsgJoinPoolResponse {
+           string                   share_out_amount = 1 [(gogoproto.customtype) = "cosmossdk.io/math.Int", (gogoproto.moretags) = "yaml:\"share_out_amount\"", (gogoproto.nullable) = false];
+  repeated cosmos.base.v1beta1.Coin token_in         = 2 [(gogoproto.moretags)   = "yaml:\"token_in\""    , (gogoproto.nullable) = false                      ] ;
+}
+
+// ===================== MsgExitPool
+message MsgExitPool {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 5;
+  option           (amino.name) = "zigchain/gamm/exit-pool";
+  option (cosmos.msg.v1.signer) =                  "sender";
+           string                   sender          = 1 [(gogoproto.moretags)   = "yaml:\"sender\""               ] ;
+           uint64                   pool_id         = 2 [(gogoproto.moretags)   = "yaml:\"pool_id\""              ] ;
+           string                   share_in_amount = 3 [(gogoproto.customtype) = "cosmossdk.io/math.Int"         , (gogoproto.moretags) = "yaml:\"share_in_amount\"", (gogoproto.nullable) = false];
+  repeated cosmos.base.v1beta1.Coin token_out_mins  = 4 [(gogoproto.moretags)   = "yaml:\"token_out_min_amounts\"", (gogoproto.nullable) = false                     ] ;
+}
+
+message MsgExitPoolResponse {
+  repeated cosmos.base.v1beta1.Coin token_out = 1 [(gogoproto.moretags) = "yaml:\"token_out\"", (gogoproto.nullable) = false];
+}
+
+message SwapAmountInRoute {
+  uint64 pool_id = 1 [ (gogoproto.moretags) = "yaml:\"pool_id\"" ];
+  string token_out_denom = 2
+      [ (gogoproto.moretags) = "yaml:\"token_out_denom\"" ];
+}
+
+message MsgSwapExactAmountIn {
+  option (amino.name) = "zigchain/gamm/swap-exact-amount-in";  
+  option (cosmos.msg.v1.signer) = "sender";
+
+  string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];
+
+  repeated SwapAmountInRoute routes = 2 [ (gogoproto.nullable) = false ];
+
+  cosmos.base.v1beta1.Coin token_in = 3 [
+    (gogoproto.moretags) = "yaml:\"token_in\"",
+    (gogoproto.nullable) = false
+  ];
+
+  string token_out_min_amount = 4 [
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.moretags) = "yaml:\"token_out_min_amount\"",
+    (gogoproto.nullable) = false
+  ];
+}
+
+message MsgSwapExactAmountInResponse {
+  string token_out_amount = 1 [
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.moretags) = "yaml:\"token_out_amount\"",
+    (gogoproto.nullable) = false
+  ];
+}
+
+message SwapAmountOutRoute {
+  uint64 pool_id = 1 [ (gogoproto.moretags) = "yaml:\"pool_id\"" ];
+  string token_in_denom = 2
+      [ (gogoproto.moretags) = "yaml:\"token_in_denom\"" ];
+}
+
+message MsgSwapExactAmountOut {
+  option (amino.name) = "zigchain/gamm/swap-exact-amount-out";
+  option (cosmos.msg.v1.signer) = "sender";
+
+  string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];
+  
+  repeated SwapAmountOutRoute routes = 2 [ (gogoproto.nullable) = false ];
+  
+  string token_in_max_amount = 3 [
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.moretags) = "yaml:\"token_in_max_amount\"",
+    (gogoproto.nullable) = false
+  ];
+
+  cosmos.base.v1beta1.Coin token_out = 4 [
+    (gogoproto.moretags) = "yaml:\"token_out\"",
+    (gogoproto.nullable) = false
+  ];
+}
+
+message MsgSwapExactAmountOutResponse {
+  string token_in_amount = 1 [
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.moretags) = "yaml:\"token_in_amount\"",
+    (gogoproto.nullable) = false
+  ];
+}
+
+message MsgJoinSwapExternAmountIn {
+  option           (amino.name) = "zigchain/gamm/join-swap-extern-amount-in";
+  option (cosmos.msg.v1.signer) = "sender";
+
+  string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];
+  uint64 pool_id = 2 [ (gogoproto.moretags) = "yaml:\"pool_id\"" ];
+  cosmos.base.v1beta1.Coin token_in = 3 [
+    (gogoproto.moretags) = "yaml:\"token_in\"",
+    (gogoproto.nullable) = false
+  ];
+  string share_out_min_amount = 4 [
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.moretags) = "yaml:\"share_out_min_amount\"",
+    (gogoproto.nullable) = false
+  ];
+
+  // repeated cosmos.base.v1beta1.Coin tokensIn = 5 [
+  //   (gogoproto.moretags) = "yaml:\"tokens_in\"",
+  //   (gogoproto.nullable) = false
+  // ];
+}
+
+message MsgJoinSwapExternAmountInResponse {
+  string share_out_amount = 1 [
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.moretags) = "yaml:\"share_out_amount\"",
+    (gogoproto.nullable) = false
+  ];
+}
+
+message MsgJoinSwapShareAmountOut {
+  option           (amino.name) = "zigchain/gamm/join-swap-share-amount-out";
+  option (cosmos.msg.v1.signer) = "sender";
+
+  string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];
+  uint64 pool_id = 2 [ (gogoproto.moretags) = "yaml:\"pool_id\"" ];
+  string token_in_denom = 3
+      [ (gogoproto.moretags) = "yaml:\"token_in_denom\"" ];
+  string share_out_amount = 4 [
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.moretags) = "yaml:\"share_out_amount\"",
+    (gogoproto.nullable) = false
+  ];
+  string token_in_max_amount = 5 [
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.moretags) = "yaml:\"token_in_max_amount\"",
+    (gogoproto.nullable) = false
+  ];
+}
+
+message MsgJoinSwapShareAmountOutResponse {
+  string token_in_amount = 1 [
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.moretags) = "yaml:\"token_in_amount\"",
+    (gogoproto.nullable) = false
+  ];
+}
+
+message MsgExitSwapExternAmountOut {
+  option           (amino.name) = "zigchain/gamm/exit-swap-extern-amount-out";
+  option (cosmos.msg.v1.signer) = "sender";
+
+  string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];
+  uint64 pool_id = 2 [ (gogoproto.moretags) = "yaml:\"pool_id\"" ];
+  cosmos.base.v1beta1.Coin token_out = 3 [
+    (gogoproto.moretags) = "yaml:\"token_out\"",
+    (gogoproto.nullable) = false
+  ];
+  string share_in_max_amount = 4 [
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.moretags) = "yaml:\"share_in_max_amount\"",
+    (gogoproto.nullable) = false
+  ];
+}
+
+message MsgExitSwapExternAmountOutResponse {
+  string share_in_amount = 1 [
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.moretags) = "yaml:\"share_in_amount\"",
+    (gogoproto.nullable) = false
+  ];
+}
+
+// ===================== MsgExitSwapShareAmountIn
+message MsgExitSwapShareAmountIn {
+  option           (amino.name) = "zigchain/gamm/exit-swap-share-amount-in";
+  option (cosmos.msg.v1.signer) = "sender";
+
+  string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];
+  uint64 pool_id = 2 [ (gogoproto.moretags) = "yaml:\"pool_id\"" ];
+  string token_out_denom = 3
+      [ (gogoproto.moretags) = "yaml:\"token_out_denom\"" ];
+  string share_in_amount = 4 [
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.moretags) = "yaml:\"share_in_amount\"",
+    (gogoproto.nullable) = false
+  ];
+  string token_out_min_amount = 5 [
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.moretags) = "yaml:\"token_out_min_amount\"",
+    (gogoproto.nullable) = false
+  ];
+}
+
+message MsgExitSwapShareAmountInResponse {
+  string token_out_amount = 1 [
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.moretags) = "yaml:\"token_out_amount\"",
+    (gogoproto.nullable) = false
+  ];
+}
+
+// ===================== MsgCreatePool
+message MsgCreateStableswapPool {
+  option           (amino.name) = "zigchain/gamm/create-stableswap-pool";
+  option (cosmos.msg.v1.signer) = "creator";
+
+  string creator = 1 [ (gogoproto.moretags) = "yaml:\"creator\"" ];
+
+  PoolParams pool_params = 2 [ (gogoproto.moretags) = "yaml:\"pool_params\"" ];
+
+  repeated cosmos.base.v1beta1.Coin initial_pool_liquidity = 3 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+
+  repeated uint64 scaling_factors = 4
+      [ (gogoproto.moretags) = "yaml:\"stableswap_scaling_factor\"" ];
+
+  string future_pool_governor = 5
+      [ (gogoproto.moretags) = "yaml:\"future_pool_governor\"" ];
+
+  string scaling_factor_controller = 6
+      [ (gogoproto.moretags) = "yaml:\"scaling_factor_controller\"" ];
+}
+
+// Returns a poolID with custom poolName.
+message MsgCreateStableswapPoolResponse {
+  uint64 pool_id = 1 [(gogoproto.customname) = "PoolID"];
+}
+
+// Sender must be the pool's scaling_factor_governor in order for the tx to
+// succeed. Adjusts stableswap scaling factors.
+message MsgStableSwapAdjustScalingFactors {
+    option (cosmos.msg.v1.signer) = "creator";
+  string creator = 4;
+  option (amino.name) = "osmosis/gamm/stableswap-adjust-scaling-factors";
+  option (cosmos.msg.v1.signer) = "sender";
+
+  string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];
+  uint64 pool_id = 2 [ (gogoproto.customname) = "PoolID" ];
+
+  repeated uint64 scaling_factors = 3
+      [ (gogoproto.moretags) = "yaml:\"stableswap_scaling_factor\"" ];
+}
+
+message MsgStableSwapAdjustScalingFactorsResponse {}

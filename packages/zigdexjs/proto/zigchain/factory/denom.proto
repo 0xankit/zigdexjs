@@ -1,0 +1,27 @@
+syntax = "proto3";
+package zigchain.factory;
+import "gogoproto/gogo.proto";
+import "cosmos_proto/cosmos.proto";
+import "amino/amino.proto";
+option go_package = "zigchain/x/factory/types";
+
+// Denom is the protobuf definition for the factory module.
+// type name = order in binary message
+// this will generate all kind of go files based on protobuf
+message Denom {
+  string creator = 1;
+  string denom = 2;
+  string maxSupply = 3 [
+    (cosmos_proto.scalar)  = "cosmos.UInt",
+    (gogoproto.customtype) = "cosmossdk.io/math.Uint",
+    (gogoproto.nullable)   = false,
+    (amino.dont_omitempty) = true
+  ];
+  string supply = 4 [
+    (cosmos_proto.scalar)  = "cosmos.UInt",
+    (gogoproto.customtype) = "cosmossdk.io/math.Uint",
+    (gogoproto.nullable)   = false,
+    (amino.dont_omitempty) = true
+  ];
+  bool canChangeMaxSupply = 5;
+}
